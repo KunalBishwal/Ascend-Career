@@ -85,7 +85,7 @@ RULES:
 3. Subsequent nodes should represent realistic career progression, 2-3 of them "upcoming", and the final 1-2 as "locked" (aspirational long-term goals).
 4. Each node gets a unique "col" (0 = leftmost, increasing rightward) and "row" (0 = top lane, 1 = bottom lane). Alternate rows to create a zig-zag layout.
 5. "prerequisites" should list the "id" of the node(s) that come before it.
-6. Be realistic with salary ranges for the candidate's region/field.
+6. Be realistic with salary ranges for the candidate's region (primary focus: India). Use Indian Rupee (INR) and Indian formatting (e.g., ₹6L - ₹10L).
 7. Skills should be 3-5 specific, actionable skills for that role.
 
 Return ONLY valid JSON matching this structure:

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   MapPin,
-  DollarSign,
+  IndianRupee,
   Clock,
   Bookmark,
   Building2,
@@ -126,7 +126,7 @@ async function fetchJSearchJobs(params: FetchParams): Promise<Job[]> {
       ? `${item.job_city}, ${item.job_state || item.job_country}`
       : item.job_is_remote ? "Remote" : "Not specified",
     salary: item.job_min_salary && item.job_max_salary
-      ? `$${Math.round(item.job_min_salary / 1000)}k - $${Math.round(item.job_max_salary / 1000)}k`
+      ? `₹${Math.round(item.job_min_salary / 1000)}k - ₹${Math.round(item.job_max_salary / 1000)}k`
       : "Salary not listed",
     type: item.job_employment_type?.replace("FULLTIME", "Full-time").replace("PARTTIME", "Part-time").replace("CONTRACTOR", "Contract").replace("INTERN", "Internship") || "Full-time",
     posted: item.job_posted_at_datetime_utc ? timeAgo(item.job_posted_at_datetime_utc) : "Recently",
@@ -166,7 +166,7 @@ async function fetchActiveJobsDB(params: FetchParams): Promise<Job[]> {
       company: job.organization || "Unknown",
       location: job.locations_derived?.[0] || job.locations_raw?.[0]?.address?.addressLocality || "Not specified",
       salary: job.salary_raw?.value
-        ? `${job.salary_raw.currency || "USD"} ${job.salary_raw.value.minValue || ""}${job.salary_raw.value.maxValue ? `–${job.salary_raw.value.maxValue}` : ""} / ${job.salary_raw.value.unitText?.toLowerCase() || "year"}`
+        ? `${job.salary_raw.currency === 'USD' ? '₹' : job.salary_raw.currency || '₹'} ${job.salary_raw.value.minValue || ""}${job.salary_raw.value.maxValue ? `–${job.salary_raw.value.maxValue}` : ""} / ${job.salary_raw.value.unitText?.toLowerCase() || "year"}`
         : "Salary not listed",
       type: Array.isArray(job.employment_type)
         ? job.employment_type[0]
@@ -651,7 +651,7 @@ export default function Jobs() {
                       </span>
                       {job.salary !== "Salary not listed" && (
                         <span className="flex items-center gap-1">
-                          <DollarSign className="w-3 h-3" />
+                          <IndianRupee className="w-3 h-3" />
                           {job.salary}
                         </span>
                       )}
@@ -738,7 +738,7 @@ export default function Jobs() {
                       </div>
                       <div className="p-4 rounded-xl bg-accent/50">
                         <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                          <DollarSign className="w-4 h-4" />
+                          <IndianRupee className="w-4 h-4" />
                           <span className="text-xs">Salary</span>
                         </div>
                         <p className="font-medium text-sm">{selectedJob.salary}</p>

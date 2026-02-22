@@ -248,20 +248,22 @@ export default function Learning() {
       // ── Determine queries ────────────────────────────────────────────────
       const queries: { q: string; skill: string }[] = [];
 
-      // If user typed a search query, prioritize it
       if (searchQuery.trim()) {
         queries.push({ q: searchQuery.trim(), skill: "Search" });
-        // Also keep a few curated ones if it's a general refresh
-        if (!isSearchTrigger) {
-          if (role) queries.push({ q: role, skill: "Recommended" });
+        if (!isSearchTrigger && role) {
+          queries.push({ q: role, skill: "Recommended" });
         }
       } else {
-        // Normal resume-based fetch
-        if (role) queries.push({ q: role, skill: "Recommended" });
-        skillList.slice(0, 3).forEach((s) =>
-          queries.push({ q: s.name, skill: s.name })
+        // Shuffled resume-based fetch for dynamicity
+        if (role) queries.push({ q: `${role} roadmap`, skill: "Recommended" });
+
+        // Pick 4 random skills from the list instead of first 3
+        const shuffledSkills = [...skillList].sort(() => Math.random() - 0.5);
+        shuffledSkills.slice(0, 4).forEach((s) =>
+          queries.push({ q: `${s.name} tutorial`, skill: s.name })
         );
-        if (queries.length === 0) queries.push({ q: "software engineering career", skill: "General" });
+
+        if (queries.length === 0) queries.push({ q: "modern software engineering 2024", skill: "General" });
       }
 
       const results = await Promise.all(
@@ -344,21 +346,22 @@ export default function Learning() {
                 className="w-56 h-10 pl-10 pr-4 rounded-xl bg-accent/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
               />
             </div>
-            <button
+            <AnimatedButton
               onClick={() => fetchCourses(true)}
               disabled={loading}
-              className="px-4 h-10 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+              variant="hero"
+              className="h-10 px-4"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Search
-            </button>
+            </AnimatedButton>
             <button
               onClick={() => { setSearchQuery(""); fetchCourses(); }}
               disabled={loading}
-              className="h-10 w-10 rounded-xl bg-accent/50 border border-border flex items-center justify-center hover:border-primary/50 transition-colors"
-              title="Reset to Recommendations"
+              className="h-10 px-4 rounded-xl bg-accent/50 border border-border flex items-center justify-center gap-2 hover:border-primary/50 text-sm font-medium transition-colors"
+              title="Shuffle Recommendations"
             >
               <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+              Shuffle
             </button>
           </div>
         </motion.div>

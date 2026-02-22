@@ -111,7 +111,7 @@ Return a JSON object with this EXACT structure:
       "matchScore": <number 0-100>,
       "description": "<string>",
       "requiredSkills": ["<string>"],
-      "salaryRange": "<string>"
+      "salaryRange": "<string: e.g. '₹6L - ₹10L' annually>"
     }
   ],
   "summary": "<string: 2-3 sentence professional summary>"

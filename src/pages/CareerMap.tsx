@@ -4,7 +4,7 @@ import {
   ChevronRight,
   Star,
   Clock,
-  DollarSign,
+  IndianRupee,
   BookOpen,
   CheckCircle2,
   Lock,
@@ -175,12 +175,12 @@ function NodeEditor({ node, onSave, onDelete, onClose }: NodeEditorProps) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1.5">
-                  <DollarSign className="w-3 h-3 inline mr-1" />Salary Range
+                  <IndianRupee className="w-3 h-3 inline mr-1" />Salary Range
                 </label>
                 <input
                   value={draft.salary}
                   onChange={(e) => set("salary", e.target.value)}
-                  placeholder="e.g. $80k–$100k"
+                  placeholder="e.g. ₹8L–₹12L"
                   className="w-full h-10 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
                 />
               </div>
@@ -359,7 +359,7 @@ export default function CareerMap() {
       level: "Mid",
       status: "locked",
       description: "Define this milestone",
-      salary: "TBD",
+      salary: "₹ TBD",
       duration: "TBD",
       skills: [],
       col: (lastNode?.col ?? 0) + 1,
@@ -664,7 +664,7 @@ export default function CareerMap() {
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{node.description}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{node.salary}</span>
+                      <span className="flex items-center gap-1"><IndianRupee className="w-3 h-3" />{node.salary}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{node.duration}</span>
                     </div>
                   </div>
@@ -704,7 +704,7 @@ export default function CareerMap() {
                   {selectedNode.description && <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{selectedNode.description}</p>}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="p-4 rounded-xl bg-accent/50 border border-border/50">
-                      <div className="flex items-center gap-2 text-muted-foreground mb-1"><DollarSign className="w-4 h-4" /><span className="text-xs">Salary Range</span></div>
+                      <div className="flex items-center gap-2 text-muted-foreground mb-1"><IndianRupee className="w-4 h-4" /><span className="text-xs">Salary Range</span></div>
                       <p className="font-semibold">{selectedNode.salary}</p>
                     </div>
                     <div className="p-4 rounded-xl bg-accent/50 border border-border/50">

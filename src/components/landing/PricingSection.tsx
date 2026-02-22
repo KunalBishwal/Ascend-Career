@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 const plans = [
     {
         name: "Free",
-        price: "$0",
+        price: "₹0",
         period: "forever",
         description: "Get started with essential career tools",
         icon: Sparkles,
@@ -26,7 +26,7 @@ const plans = [
     },
     {
         name: "Pro",
-        price: "$19",
+        price: "₹999",
         period: "per month",
         description: "Everything you need to accelerate your career",
         icon: Zap,
@@ -47,21 +47,40 @@ const plans = [
     },
     {
         name: "Teams",
-        price: "$49",
+        price: "₹2,999",
         period: "per month",
-        description: "For teams and organizations investing in talent",
+        description: "For small teams investing in talent development",
         icon: Crown,
-        color: "from-accent-foreground to-primary",
+        color: "from-indigo-500 to-purple-600",
         features: [
             "Everything in Pro",
             "Up to 10 team members",
             "Team analytics dashboard",
             "Bulk resume reviews",
             "Custom career paths",
-            "Dedicated account manager",
-            "API access",
+            "Priority technical support",
         ],
-        cta: "Contact Sales",
+        cta: "Get Started",
+        href: "/login",
+        highlighted: false,
+    },
+    {
+        name: "Enterprise",
+        price: "₹9,999",
+        period: "per month",
+        description: "Scale your organization with advanced AI capabilities",
+        icon: Crown,
+        color: "from-accent-foreground to-primary",
+        features: [
+            "Everything in Teams",
+            "Unlimited team members",
+            "Custom AI model fine-tuning",
+            "LMS integration support",
+            "Advanced security & SSO",
+            "Dedicated account manager",
+            "API access with higher limits",
+        ],
+        cta: "Talk to Sales",
         href: "/login",
         highlighted: false,
     },
@@ -93,7 +112,7 @@ export function PricingSection() {
                 </motion.div>
 
                 {/* Plans */}
-                <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
                     {plans.map((plan, index) => (
                         <motion.div
                             key={plan.name}
