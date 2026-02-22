@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Star, Sparkles, Quote } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { GradientText } from "@/components/ui/gradient-text";
+import Galaxy from "@/components/ui/galaxy";
 
 const testimonials = [
     {
@@ -66,8 +67,21 @@ function StarRating({ count }: { count: number }) {
 
 export function TestimonialsSection() {
     return (
-        <section id="testimonials" className="py-24 relative overflow-hidden">
-            <div className="container mx-auto px-4">
+        <section id="testimonials" className="py-24 relative overflow-hidden min-h-[800px] flex items-center bg-[#020202]">
+            {/* Galaxy Background */}
+            <div className="absolute inset-0 z-0">
+                <Galaxy
+                    transparent={true}
+                    hueShift={210}
+                    rotationSpeed={0.03}
+                    speed={1.0}
+                    density={1.2}
+                />
+                {/* Subtle overlay for depth and readability */}
+                <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] pointer-events-none" />
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10">
                 {/* Header */}
                 <motion.div
                     className="text-center mb-16"
@@ -76,21 +90,21 @@ export function TestimonialsSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
-                        <Sparkles className="w-4 h-4" />
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-white text-sm font-medium mb-6 backdrop-blur-md">
+                        <Sparkles className="w-4 h-4 text-primary" />
                         Success Stories
                     </div>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-6">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-6 text-white text-shadow-lg">
                         Careers <GradientText>Transformed</GradientText>
                     </h2>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-300 max-w-2xl mx-auto drop-shadow-md">
                         Join thousands of professionals who have accelerated their careers with Ascend Career.
                     </p>
                 </motion.div>
 
                 {/* Stats bar */}
                 <motion.div
-                    className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-16"
+                    className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-16 bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -102,8 +116,8 @@ export function TestimonialsSection() {
                         { value: "87%", label: "Got Promoted/Hired" },
                     ].map((stat) => (
                         <div key={stat.label} className="text-center">
-                            <p className="text-2xl font-display font-bold gradient-text-hero">{stat.value}</p>
-                            <p className="text-sm text-muted-foreground">{stat.label}</p>
+                            <p className="text-2xl font-display font-bold text-white tracking-tight">{stat.value}</p>
+                            <p className="text-xs uppercase tracking-wider text-gray-400 font-medium">{stat.label}</p>
                         </div>
                     ))}
                 </motion.div>
@@ -118,19 +132,19 @@ export function TestimonialsSection() {
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.08, duration: 0.5 }}
                         >
-                            <GlassCard className="h-full flex flex-col relative">
-                                <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/10" />
+                            <GlassCard className="h-full flex flex-col relative group hover:border-primary/50 transition-colors duration-500">
+                                <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20 group-hover:text-primary/40 transition-colors" />
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-lg`}>
                                         {t.avatar}
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-sm">{t.name}</p>
-                                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                                        <p className="font-semibold text-sm text-white">{t.name}</p>
+                                        <p className="text-xs text-gray-400">{t.role}</p>
                                     </div>
                                 </div>
                                 <StarRating count={t.stars} />
-                                <p className="mt-4 text-sm text-muted-foreground leading-relaxed flex-1">
+                                <p className="mt-4 text-sm text-gray-300 leading-relaxed flex-1 italic line-clamp-4">
                                     "{t.text}"
                                 </p>
                             </GlassCard>

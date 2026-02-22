@@ -364,6 +364,7 @@ export default function CareerMap() {
       skills: [],
       col: (lastNode?.col ?? 0) + 1,
       row: (lastNode?.row === 0 ? 1 : 0) as 0 | 1,
+      prerequisites: [],
     };
     const newRoadmap = { ...roadmap, nodes: [...roadmap.nodes, newNode] };
     setRoadmap(newRoadmap);

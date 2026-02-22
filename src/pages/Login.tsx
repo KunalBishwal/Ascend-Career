@@ -5,7 +5,7 @@ import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react
 import { GlassCard } from "@/components/ui/glass-card";
 import { GradientText } from "@/components/ui/gradient-text";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Aurora } from "@/components/ui/aurora";
+import { GridScan } from "@/components/ui/grid-scan";
 import { signIn, signUp, signInWithGoogle } from "@/integrations/firebase/auth";
 
 export default function Login() {
@@ -32,7 +32,7 @@ export default function Login() {
             } else {
                 await signIn(form.email, form.password);
             }
-            navigate("/dashboard");
+            navigate("/");
         } catch (err: unknown) {
             const firebaseError = err as { code?: string; message?: string };
             const errorMessages: Record<string, string> = {
@@ -58,7 +58,7 @@ export default function Login() {
         setError(null);
         try {
             await signInWithGoogle();
-            navigate("/dashboard");
+            navigate("/");
         } catch (err: unknown) {
             const firebaseError = err as { message?: string };
             setError(firebaseError.message || "Google sign-in failed. Please try again.");
@@ -69,11 +69,16 @@ export default function Login() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background">
-            <div className="absolute inset-0 z-0">
-                <Aurora
-                    colorStops={['#0ea5e9', '#8b5cf6', '#0ea5e9']}
-                    amplitude={1.0}
-                    className="w-full h-full opacity-40"
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <GridScan
+                    linesColor="#2a1e3e"
+                    scanColor="#8b5cf6"
+                    scanOpacity={0.4}
+                    gridScale={0.08}
+                    scanDuration={3.0}
+                    bloomIntensity={0.8}
+                    noiseIntensity={0.02}
+                    enableWebcam={false}
                 />
             </div>
 
@@ -81,25 +86,25 @@ export default function Login() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="w-full max-w-md relative z-10"
+                className="w-full max-w-xl relative z-10"
             >
                 {/* Logo */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-10">
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <h1 className="text-4xl font-display font-bold mb-2">
-                            <GradientText>Ascend</GradientText>
+                        <h1 className="text-6xl font-display font-bold mb-4">
+                            <GradientText>Ascend Career</GradientText>
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="text-lg text-muted-foreground">
                             {isSignUp ? "Create your account" : "Welcome back"}
                         </p>
                     </motion.div>
                 </div>
 
-                <GlassCard className="p-8">
+                <GlassCard className="p-10 shrink-0">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name field (sign up only) */}
                         {isSignUp && (

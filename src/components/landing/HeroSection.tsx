@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 
 // Lazy load 3D component
-const FloatingOrb = React.lazy(() => import("@/components/3d/FloatingOrb").then(m => ({ default: m.FloatingOrb })));
+const ResumeVisual = React.lazy(() => import("@/components/3d/ResumeVisual").then(m => ({ default: m.ResumeVisual })));
 import GridDistortion from "@/components/ui/grid-distortion";
 
 const stats = [
@@ -55,6 +55,7 @@ export function HeroSection() {
       );
     }
   }, []);
+
 
   return (
     <section
@@ -120,15 +121,15 @@ export function HeroSection() {
         />
       </div>
 
-      {/* 3D Floating Orb - Hidden on mobile for performance */}
+      {/* 3D Resume Visual - Hidden on mobile for performance */}
       {show3D && (
-        <div className="absolute right-0 top-1/4 w-[400px] h-[400px] hidden xl:block pointer-events-none">
+        <div className="absolute right-0 top-1/4 w-[500px] h-[500px] hidden xl:block pointer-events-none">
           <Suspense fallback={
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="w-8 h-8 animate-spin text-primary/50" />
             </div>
           }>
-            <FloatingOrb className="w-full h-full" />
+            <ResumeVisual className="w-full h-full" />
           </Suspense>
         </div>
       )}
@@ -172,7 +173,7 @@ export function HeroSection() {
           {/* Title */}
           <h1
             ref={titleRef}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight mb-6 text-white"
           >
             <span className="word inline-block">Your</span>{" "}
             <span className="word inline-block">
