@@ -20,6 +20,7 @@ interface Props {
     onNewChat: () => void;
     onLoadSession: (id: string) => void;
     onDeleteSession: (id: string) => void;
+    isMobile?: boolean;
 }
 
 /* ── Date grouping helper ─────────────────────────────────────────────────── */
@@ -118,7 +119,6 @@ function DeleteModal({
     );
 }
 
-/* ── Main sidebar component ───────────────────────────────────────────────── */
 export function ChatHistorySidebar({
     sessions,
     activeSessionId,
@@ -126,6 +126,7 @@ export function ChatHistorySidebar({
     onNewChat,
     onLoadSession,
     onDeleteSession,
+    isMobile = false,
 }: Props) {
     const [collapsed, setCollapsed] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<ChatSession | null>(null);
@@ -153,20 +154,28 @@ export function ChatHistorySidebar({
             </AnimatePresence>
 
             <div className="relative flex-shrink-0 h-full">
-                {/* Expand / collapse toggle */}
-                <button
-                    onClick={() => setCollapsed((c) => !c)}
-                    className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
-                >
-                    {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-                </button>
+                {/* Expand / collapse toggle — hidden on mobile */}
+                {!isMobile && (
+                    <button
+                        onClick={() => setCollapsed((c) => !c)}
+                        className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                    >
+                        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+                    </button>
+                )}
 
                 {/* Sidebar panel */}
                 <div
-                    className="h-full overflow-hidden transition-all duration-300 ease-in-out"
-                    style={{ width: collapsed ? 0 : 260 }}
+                    className={cn(
+                        "h-full overflow-hidden transition-all duration-300 ease-in-out",
+                        isMobile ? "w-[280px]" : ""
+                    )}
+                    style={{ width: isMobile ? 280 : (collapsed ? 0 : 260) }}
                 >
-                    <div className="w-[260px] h-full flex flex-col bg-card/60 backdrop-blur-md border-r border-border/50 rounded-l-2xl">
+                    <div className={cn(
+                        "h-full flex flex-col bg-card/60 backdrop-blur-md border-r border-border/50",
+                        isMobile ? "w-full rounded-none" : "w-[260px] rounded-l-2xl"
+                    )}>
                         {/* Header */}
                         <div className="p-4 border-b border-border/40">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">

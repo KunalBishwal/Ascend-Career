@@ -142,7 +142,7 @@ function NodeEditor({ node, onSave, onDelete, onClose }: NodeEditorProps) {
               <input
                 value={draft.title}
                 onChange={(e) => set("title", e.target.value)}
-                className="w-full h-10 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
+                className="w-full h-11 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
               />
             </div>
 
@@ -181,7 +181,7 @@ function NodeEditor({ node, onSave, onDelete, onClose }: NodeEditorProps) {
                   value={draft.salary}
                   onChange={(e) => set("salary", e.target.value)}
                   placeholder="e.g. ₹8L–₹12L"
-                  className="w-full h-10 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
+                  className="w-full h-11 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
                 />
               </div>
               <div>
@@ -192,7 +192,7 @@ function NodeEditor({ node, onSave, onDelete, onClose }: NodeEditorProps) {
                   value={draft.duration}
                   onChange={(e) => set("duration", e.target.value)}
                   placeholder="e.g. 6–12 months"
-                  className="w-full h-10 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
+                  className="w-full h-11 px-3 rounded-xl bg-accent/50 border border-border focus:border-primary outline-none text-sm transition-colors"
                 />
               </div>
             </div>
@@ -438,7 +438,11 @@ export default function CareerMap() {
               Your <GradientText>Career Galaxy</GradientText>
             </h1>
             <p className="text-muted-foreground text-sm">
-              {roadmap?.currentRole} → {roadmap?.targetRole} · Estimated {roadmap?.totalEstimatedTime}
+              <span className="inline-block">{roadmap?.currentRole}</span>
+              <span className="mx-2 opacity-50">→</span>
+              <span className="inline-block">{roadmap?.targetRole}</span>
+              <span className="mx-2 opacity-30">·</span>
+              <span className="inline-block text-primary/80">Est. {roadmap?.totalEstimatedTime}</span>
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -497,7 +501,7 @@ export default function CareerMap() {
         </AnimatePresence>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />, label: "Completed", value: nodes.filter((n) => n.status === "completed").length, bg: "bg-emerald-500/10 border-emerald-500/20" },
             { icon: <Star className="w-4 h-4 text-violet-400" />, label: "Current", value: nodes.filter((n) => n.status === "current").length, bg: "bg-violet-500/10 border-violet-500/20" },
@@ -506,127 +510,131 @@ export default function CareerMap() {
           ].map((stat) => (
             <div key={stat.label} className={`p-3 rounded-xl border ${stat.bg} flex items-center gap-3`}>
               {stat.icon}
-              <div>
-                <p className="text-lg font-bold">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <div className="min-w-0">
+                <p className="text-sm sm:text-lg font-bold truncate">{stat.value}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{stat.label}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Galaxy Visualization */}
+        {/* Galaxy Visualization — Scrollable on mobile */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-          <GlassCard className="relative overflow-hidden p-6 min-h-[420px]">
-            {/* Background stars */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {Array.from({ length: 40 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white/20 rounded-full"
-                  style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
-                  animate={{ opacity: [0.1, 0.6, 0.1], scale: [0.8, 1.2, 0.8] }}
-                  transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }}
-                />
-              ))}
-            </div>
+          <GlassCard className="relative p-0 overflow-hidden sm:p-6 min-h-[420px]">
+            <div className="overflow-x-auto overflow-y-hidden scrollbar-hide py-4 md:py-0">
+              <div className="relative min-w-[800px] md:min-w-full min-h-[400px]">
+                {/* Background stars */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  {Array.from({ length: 40 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-white/20 rounded-full"
+                      style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+                      animate={{ opacity: [0.1, 0.6, 0.1], scale: [0.8, 1.2, 0.8] }}
+                      transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 2 }}
+                    />
+                  ))}
+                </div>
 
-            {/* Connection lines (SVG) */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-              <defs>
-                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="rgb(139,92,246)" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="rgb(56,189,248)" stopOpacity="0.6" />
-                </linearGradient>
-              </defs>
-              {nodes.map((node, i) => {
-                if (i === 0) return null;
-                const prev = nodes[i - 1];
-                const maxCol = Math.max(...nodes.map((n) => n.col), 1);
-                const x1 = (prev.col / maxCol) * 80 + 10;
-                const y1 = prev.row === 0 ? 30 : 70;
-                const x2 = (node.col / maxCol) * 80 + 10;
-                const y2 = node.row === 0 ? 30 : 70;
-                return (
-                  <motion.line
-                    key={`line-${i}`}
-                    x1={`${x1}%`} y1={`${y1}%`}
-                    x2={`${x2}%`} y2={`${y2}%`}
-                    stroke="url(#lineGrad)"
-                    strokeWidth="2"
-                    strokeDasharray="6 4"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: i * 0.15 }}
-                  />
-                );
-              })}
-            </svg>
-
-            {/* Nodes */}
-            <div className="relative" style={{ zIndex: 1, minHeight: 380 }}>
-              {nodes.map((node, i) => {
-                const maxCol = Math.max(...nodes.map((n) => n.col), 1);
-                const leftPct = (node.col / maxCol) * 80 + 10;
-                const topPct = node.row === 0 ? 20 : 60;
-
-                return (
-                  <motion.div
-                    key={node.id}
-                    className="absolute cursor-pointer group"
-                    style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: "translate(-50%, -50%)" }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", damping: 15, stiffness: 200, delay: i * 0.12 }}
-                    whileHover={{ scale: 1.12, zIndex: 10 }}
-                    onClick={() => isEditMode ? setEditingNode(node) : setSelectedNode(node)}
-                  >
-                    {/* Glow ring for current */}
-                    {node.status === "current" && (
-                      <motion.div
-                        className="absolute inset-0 rounded-2xl bg-violet-500/20 blur-xl"
-                        animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        style={{ width: "100%", height: "100%" }}
+                {/* Connection lines (SVG) */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+                  <defs>
+                    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="rgb(139,92,246)" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="rgb(56,189,248)" stopOpacity="0.6" />
+                    </linearGradient>
+                  </defs>
+                  {nodes.map((node, i) => {
+                    if (i === 0) return null;
+                    const prev = nodes[i - 1];
+                    const maxCol = Math.max(...nodes.map((n) => n.col), 1);
+                    const x1 = (prev.col / maxCol) * 80 + 10;
+                    const y1 = prev.row === 0 ? 30 : 70;
+                    const x2 = (node.col / maxCol) * 80 + 10;
+                    const y2 = node.row === 0 ? 30 : 70;
+                    return (
+                      <motion.line
+                        key={`line-${i}`}
+                        x1={`${x1}%`} y1={`${y1}%`}
+                        x2={`${x2}%`} y2={`${y2}%`}
+                        stroke="url(#lineGrad)"
+                        strokeWidth="2"
+                        strokeDasharray="6 4"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 0.8, delay: i * 0.15 }}
                       />
-                    )}
+                    );
+                  })}
+                </svg>
 
-                    {/* Node circle */}
-                    <div
-                      className={cn(
-                        `relative w-16 h-16 rounded-2xl bg-gradient-to-br ${STATUS_COLORS[node.status]} flex items-center justify-center text-white shadow-xl ${STATUS_GLOW[node.status]} border border-white/10 transition-all`,
-                        isEditMode && "ring-2 ring-amber-400/50 ring-offset-1 ring-offset-transparent"
-                      )}
-                    >
-                      {statusIcon(node.status)}
-                      {/* Edit overlay */}
-                      {isEditMode && (
-                        <div className="absolute inset-0 rounded-2xl bg-amber-400/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Pencil className="w-5 h-5 text-amber-300" />
+                {/* Nodes */}
+                <div className="relative" style={{ zIndex: 1, minHeight: 380 }}>
+                  {nodes.map((node, i) => {
+                    const maxCol = Math.max(...nodes.map((n) => n.col), 1);
+                    const leftPct = (node.col / maxCol) * 80 + 10;
+                    const topPct = node.row === 0 ? 20 : 60;
+
+                    return (
+                      <motion.div
+                        key={node.id}
+                        className="absolute cursor-pointer group"
+                        style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: "translate(-50%, -50%)" }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", damping: 15, stiffness: 200, delay: i * 0.12 }}
+                        whileHover={{ scale: 1.12, zIndex: 10 }}
+                        onClick={() => isEditMode ? setEditingNode(node) : setSelectedNode(node)}
+                      >
+                        {/* Glow ring for current */}
+                        {node.status === "current" && (
+                          <motion.div
+                            className="absolute inset-0 rounded-2xl bg-violet-500/20 blur-xl"
+                            animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            style={{ width: "100%", height: "100%" }}
+                          />
+                        )}
+
+                        {/* Node circle */}
+                        <div
+                          className={cn(
+                            `relative w-16 h-16 rounded-2xl bg-gradient-to-br ${STATUS_COLORS[node.status]} flex items-center justify-center text-white shadow-xl ${STATUS_GLOW[node.status]} border border-white/10 transition-all`,
+                            isEditMode && "ring-2 ring-amber-400/50 ring-offset-1 ring-offset-transparent"
+                          )}
+                        >
+                          {statusIcon(node.status)}
+                          {/* Edit overlay */}
+                          {isEditMode && (
+                            <div className="absolute inset-0 rounded-2xl bg-amber-400/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Pencil className="w-5 h-5 text-amber-300" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
 
-                    {/* Label */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-28 text-center">
-                      <p className="text-xs font-semibold text-foreground truncate">{node.title}</p>
-                      <p className="text-[10px] text-muted-foreground">{node.duration}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                        {/* Label */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-28 text-center">
+                          <p className="text-xs font-semibold text-foreground truncate">{node.title}</p>
+                          <p className="text-[10px] text-muted-foreground">{node.duration}</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
 
-            {/* Legend */}
-            <div className="absolute bottom-4 left-4 flex flex-wrap gap-4 text-xs">
-              {(["Completed", "Current", "Upcoming", "Locked"] as const).map((label) => {
-                const colorMap: Record<string, string> = { Completed: "bg-emerald-500", Current: "bg-violet-500", Upcoming: "bg-sky-500", Locked: "bg-slate-500" };
-                return (
-                  <div key={label} className="flex items-center gap-1.5">
-                    <div className={`w-2.5 h-2.5 rounded-full ${colorMap[label]}`} />
-                    <span className="text-muted-foreground">{label}</span>
-                  </div>
-                );
-              })}
+                {/* Legend */}
+                <div className="absolute bottom-4 left-4 flex flex-wrap gap-4 text-xs">
+                  {(["Completed", "Current", "Upcoming", "Locked"] as const).map((label) => {
+                    const colorMap: Record<string, string> = { Completed: "bg-emerald-500", Current: "bg-violet-500", Upcoming: "bg-sky-500", Locked: "bg-slate-500" };
+                    return (
+                      <div key={label} className="flex items-center gap-1.5">
+                        <div className={`w-2.5 h-2.5 rounded-full ${colorMap[label]}`} />
+                        <span className="text-muted-foreground">{label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </GlassCard>
         </motion.div>

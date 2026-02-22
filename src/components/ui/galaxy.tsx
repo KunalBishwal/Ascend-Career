@@ -1,5 +1,5 @@
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const vertexShader = `
 attribute vec2 uv;
@@ -41,6 +41,9 @@ varying vec2 vUv;
 #define STAR_COLOR_CUTOFF 0.2
 #define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)
 #define PERIOD 3.0
+ 
+ // Dynamic layers based on screen size
+ uniform float uNumLayers;
 
 float Hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -151,8 +154,9 @@ void main() {
 
   vec3 col = vec3(0.0);
 
-  for (float i = 0.0; i < 1.0; i += 1.0 / NUM_LAYER) {
-    float depth = fract(i + uStarSpeed * uSpeed);
+  for (float i = 0.0; i < 10.0; i += 1.0) {
+    if (i >= uNumLayers) break;
+    float depth = fract(i / uNumLayers + uStarSpeed * uSpeed);
     float scale = mix(20.0 * uDensity, 0.5 * uDensity, depth);
     float fade = depth * smoothstep(1.0, 0.9, depth);
     col += StarLayer(uv * scale + i * 453.32) * fade;
@@ -212,6 +216,14 @@ export default function Galaxy({
   const smoothMousePos = useRef({ x: 0.5, y: 0.5 });
   const targetMouseActive = useRef(0.0);
   const smoothMouseActive = useRef(0.0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (!ctnDom.current) return;
@@ -272,7 +284,8 @@ export default function Galaxy({
         uRepulsionStrength: { value: repulsionStrength },
         uMouseActiveFactor: { value: 0.0 },
         uAutoCenterRepulsion: { value: autoCenterRepulsion },
-        uTransparent: { value: transparent }
+        uTransparent: { value: transparent },
+        uNumLayers: { value: isMobile ? 2.0 : 4.0 }
       }
     });
 
@@ -344,7 +357,8 @@ export default function Galaxy({
     rotationSpeed,
     repulsionStrength,
     autoCenterRepulsion,
-    transparent
+    transparent,
+    isMobile
   ]);
 
   return <div ref={ctnDom} className="w-full h-full relative" {...rest} />;
