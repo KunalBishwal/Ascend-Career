@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, User, Bot, Copy, Check, RefreshCw } from "lucide-react";
+import { Send, User, Bot, Copy, Check, RefreshCw, Volume2, Loader2, Pause, Mic } from "lucide-react";
+import { generateSpeech } from "@/integrations/sarvam";
+import { LanguageSelector } from "@/components/mentor/LanguageSelector";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { GradientText } from "@/components/ui/gradient-text";
 import { AnimatedButton } from "@/components/ui/animated-button";
@@ -72,6 +74,14 @@ export default function AIMentor() {
 
   const [input, setInput] = useState("");
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("hi-IN");
+
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -99,6 +109,141 @@ export default function AIMentor() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleSpeak = async (messageId: string, text: string) => {
+    if (isPlaying === messageId) {
+      audioRef.current?.pause();
+      setIsPlaying(null);
+      return;
+    }
+
+    try {
+      setIsPlaying("loading-" + messageId);
+      const audioChunks = await generateSpeech({
+        text,
+        languageCode: selectedLanguage
+      });
+
+      if (!audioChunks || audioChunks.length === 0) {
+        setIsPlaying(null);
+        return;
+      }
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      let currentChunkIndex = 0;
+
+      const playNextChunk = () => {
+        if (currentChunkIndex >= audioChunks.length) {
+          setIsPlaying(null);
+          return;
+        }
+
+        const audio = new Audio(`data:audio/wav;base64,${audioChunks[currentChunkIndex]}`);
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          currentChunkIndex++;
+          playNextChunk();
+        };
+
+        audio.onpause = () => {
+          // If we pause, we stop the sequence
+          setIsPlaying(null);
+        };
+
+        audio.play().catch(err => {
+          console.error("Playback error:", err);
+          setIsPlaying(null);
+        });
+      };
+
+      setIsPlaying(messageId);
+      playNextChunk();
+    } catch (error) {
+      console.error("TTS Error:", error);
+      setIsPlaying(null);
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      recorderRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      let silenceStart: number | null = null;
+      const silenceThreshold = 10; // Adjust threshold based on testing
+      const silenceDuration = 2000; // 2 seconds
+
+      const checkSilence = () => {
+        if (recorderRef.current?.state !== "recording") return;
+
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
+
+        if (average < silenceThreshold) {
+          if (!silenceStart) silenceStart = Date.now();
+          else if (Date.now() - silenceStart > silenceDuration) {
+            recorderRef.current?.stop();
+            setIsRecording(false);
+            return;
+          }
+        } else {
+          silenceStart = null;
+        }
+
+        if (recorderRef.current?.state === "recording") {
+          requestAnimationFrame(checkSilence);
+        }
+      };
+
+      const recorder = new MediaRecorder(stream);
+      recorderRef.current = recorder;
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        setIsTranscribing(true);
+        try {
+          const { transcribeAudio } = await import("@/integrations/sarvam");
+          const text = await transcribeAudio(audioBlob, selectedLanguage);
+          if (text.trim()) {
+            setInput(text);
+          }
+        } catch (error) {
+          console.error("STT Error:", error);
+        } finally {
+          setIsTranscribing(false);
+          stream.getTracks().forEach(track => track.stop());
+          audioContext.close();
+        }
+      };
+
+      recorder.start();
+      setIsRecording(true);
+      requestAnimationFrame(checkSilence);
+    } catch (error) {
+      console.error("Recording Error:", error);
     }
   };
 
@@ -308,6 +453,7 @@ export default function AIMentor() {
                           <div className="text-sm text-foreground/90 leading-relaxed">
                             <ReactMarkdown
                               components={{
+                                // ... (rest of markdown components remain unchanged)
                                 h1: ({ children }) => (
                                   <h1 className="text-xl font-bold text-foreground mt-6 mb-3 pb-1.5 border-b border-border/40 first:mt-0">{children}</h1>
                                 ),
@@ -376,6 +522,29 @@ export default function AIMentor() {
                             >
                               {message.content}
                             </ReactMarkdown>
+
+                            {/* Sarvam Audio Button */}
+                            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/10">
+                              <button
+                                onClick={() => handleSpeak(message.id, message.content)}
+                                disabled={isPlaying?.startsWith("loading-")}
+                                className={cn(
+                                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300",
+                                  isPlaying === message.id
+                                    ? "bg-primary text-white shadow-lg shadow-primary/30"
+                                    : "bg-primary/10 text-primary hover:bg-primary/20"
+                                )}
+                              >
+                                {isPlaying === "loading-" + message.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : isPlaying === message.id ? (
+                                  <Pause className="w-4 h-4 fill-current" />
+                                ) : (
+                                  <Volume2 className="w-4 h-4" />
+                                )}
+                                {isPlaying === message.id ? "Playing Voice" : "Tap to Listen"}
+                              </button>
+                            </div>
                           </div>
                         ) : (
                           <p className="whitespace-pre-line text-sm leading-relaxed">
@@ -447,19 +616,48 @@ export default function AIMentor() {
 
               {/* Input area — z-10 */}
               <div className="relative z-10 px-4 pb-4 pt-2 border-t border-border/30">
+                {/* Language Selector */}
+                <div className="mb-3 px-1">
+                  <LanguageSelector
+                    selectedCode={selectedLanguage}
+                    onSelect={setSelectedLanguage}
+                  />
+                </div>
+
                 <div className="flex gap-3 items-end bg-card/70 backdrop-blur border border-border/60 rounded-2xl px-4 py-3 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-lg">
                   <textarea
                     ref={textareaRef}
                     value={input}
                     onChange={handleInput}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask me anything about your career..."
+                    placeholder={isRecording ? "Listening..." : isTranscribing ? "Transcribing..." : "Ask me anything about your career..."}
                     rows={1}
                     className="flex-1 bg-transparent resize-none outline-none text-sm text-foreground placeholder:text-muted-foreground/60 leading-relaxed max-h-40 overflow-y-auto scrollbar-hide"
+                    disabled={isTranscribing}
                   />
+
+                  {/* Voice Button */}
+                  <button
+                    onClick={toggleRecording}
+                    disabled={isLoading || isTranscribing}
+                    className={cn(
+                      "w-9 h-9 rounded-xl flex items-center justify-center transition-all flex-shrink-0 shadow-lg",
+                      isRecording
+                        ? "bg-destructive text-destructive-foreground animate-pulse shadow-destructive/30"
+                        : "bg-primary/10 text-primary hover:bg-primary/20"
+                    )}
+                    title={isRecording ? "Stop Recording" : "Voice Input"}
+                  >
+                    {isTranscribing ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    ) : (
+                      <Mic className={cn("w-4 h-4", isRecording ? "fill-current" : "")} />
+                    )}
+                  </button>
+
                   <button
                     onClick={handleSend}
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || isLoading || isTranscribing}
                     className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0 shadow-lg shadow-primary/30"
                   >
                     <Send className="w-4 h-4" />

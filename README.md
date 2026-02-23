@@ -26,13 +26,15 @@ Ascend Career is an AI-powered professional development platform designed to hel
 
 ### 5. 🤖 AI Career Mentor
 - **Context-Aware Guidance**: A 24/7 AI mentor ready to answer your career questions, help with interview prep, or provide industry insights.
+- **🔊 Bharat-First Voice Interaction**: Integrated with **Sarvam AI** for high-quality TTS and STT in 11 Indic languages (Hindi, Bengali, Tamil, Telugu, etc.).
+- **Smart Transcription**: Hands-free voice input with automatic silence detection.
 - **Cloud-Synced History**: All your mentor conversations are saved to Firestore, allowing you to pick up exactly where you left off.
 
 ## 🛠️ Technology Stack
 - **Frontend**: React, Vite, Tailwind CSS, Framer Motion
 - **UI Components**: shadcn/ui, Lucide React
 - **Backend & Persistence**: Firebase (Auth, Firestore, Storage)
-- **AI Models**: Google Gemini Pro & Flash
+- **AI Models**: Google Gemini Pro & Flash, Sarvam AI (Bulbul & Saaras)
 - **External APIs**: YouTube Data API v3, RapidAPI (JSearch, Active Jobs DB, Remote Jobs)
 
 ## ⚙️ Setup & Installation
