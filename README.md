@@ -64,6 +64,7 @@ Ascend Career is an AI-powered professional development platform designed to hel
    VITE_GEMINI_ROADMAP_API_KEY=your_gemini_roadmap_key
    VITE_YOUTUBE_API_KEY=your_youtube_key
    VITE_RAPIDAPI_KEY=your_rapidapi_key
+   VITE_SARVAM_API_KEY=your_sarvam_key
    ```
 
 4. **Run in development mode**:
